@@ -17,6 +17,7 @@ def play_game():
 
 def pick_sequence():
     """Pick a sequence to begin the game with"""
+    disable_buttons()
     while True:
         next_value = random.randint(1, 4)
         if len(game_order) == 0:
@@ -37,11 +38,6 @@ def change_label(message):
 
 def flash_buttons():
     """Flash all buttons in the list order"""
-    global red_button
-    global yellow_button
-    global blue_button
-    global green_button
-
     delay = 500
     for button in game_order:
         if button == 1:
@@ -55,14 +51,14 @@ def flash_buttons():
 
         delay += time_delay
 
-    enable_buttons()
+    root.after(delay, lambda: enable_buttons())
 
 
 def enable_buttons():
-    green_button.config(state=tk.ACTIVE, bg="green")
-    red_button.config(state=tk.ACTIVE, bg="red")
-    blue_button.config(state=tk.ACTIVE, bg="blue")
-    yellow_button.config(state=tk.ACTIVE, bg="yellow")
+    green_button.config(state=tk.NORMAL, bg="green")
+    red_button.config(state=tk.NORMAL, bg="red")
+    blue_button.config(state=tk.NORMAL, bg="blue")
+    yellow_button.config(state=tk.NORMAL, bg="yellow")
 
 
 def animate(button):
@@ -81,21 +77,22 @@ def disable_buttons():
 
 def press_button(value):
     player_order.append(value)
-    if len(player_order) == len(game_order):
-        check_loss()
+    check_loss()
 
 
 def check_loss():
     """Check for a loss in the game, reset game if so"""
-    disable_buttons()
+    global player_order
+
+    for i in range(len(player_order)):
+        if player_order[i] != game_order[i]:
+            change_label("You lost!")
+            disable_buttons()
+            reset_game()
+
     if player_order == game_order:
-        change_label("Correct!")
-        root.after(2000, pick_sequence())
-        change_label("Playing!")
-    else:
-        change_label("You lost!")
-        disable_buttons()
-        reset_game()
+        player_order = []
+        pick_sequence()
 
 
 def reset_game():
@@ -104,7 +101,7 @@ def reset_game():
 
     player_order = []
     game_order = []
-    root.after(2000, play_button.config(text="Play!", state=tk.ACTIVE))
+    root.after(2000, lambda: play_button.config(text="Play!", state=tk.NORMAL))
 
 
 root = tk.Tk()
@@ -125,14 +122,13 @@ title = tk.Label(title_frame, text="Simon", font=("Rubrik", 40), bg="#c05746")
 title.pack()
 
 # create game buttons
-red_button = tk.Button(game_frame, bg="red", font=("Rubrik", 50), text="", width=4, activebackground="pink", command=press_button(1))
+red_button = tk.Button(game_frame, bg="red", font=("Rubrik", 50), text="", width=4, activebackground="pink", command=lambda: press_button(1))
 red_button.grid(row=0, column=0, padx=20, pady=20)
-blue_button = tk.Button(game_frame, bg="blue", font=("Rubrik", 50), text="", width=4, activebackground="light blue", command=press_button(2))
+blue_button = tk.Button(game_frame, bg="blue", font=("Rubrik", 50), text="", width=4, activebackground="light blue", command=lambda: press_button(2))
 blue_button.grid(row=1, column=0, padx=20, pady=20)
-yellow_button = tk.Button(game_frame, bg="yellow", font=("Rubrik", 50), text="", width=4, activebackground="light yellow", command=press_button(3))
-
+yellow_button = tk.Button(game_frame, bg="yellow", font=("Rubrik", 50), text="", width=4, activebackground="light yellow", command=lambda: press_button(3))
 yellow_button.grid(row=0, column=1, padx=20, pady=20)
-green_button = tk.Button(game_frame, bg="green", font=("Rubrik", 50), text="", width=4, activebackground="light green", command=press_button(4))
+green_button = tk.Button(game_frame, bg="green", font=("Rubrik", 50), text="", width=4, activebackground="light green", command=lambda: press_button(4))
 green_button.grid(row=1, column=1, padx=20, pady=20)
 
 play_button = tk.Button(score_frame, text="Play!", font=("Rubrik", 25), bg="green", command=play_game)
