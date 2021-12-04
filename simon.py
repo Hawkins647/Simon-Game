@@ -5,6 +5,7 @@ import random
 game_order = []
 player_order = []
 time_delay = 500
+score = 0
 
 
 # functions
@@ -55,6 +56,7 @@ def flash_buttons():
 
 
 def enable_buttons():
+    """Enable all buttons and change their backgrounds to the regular colours"""
     green_button.config(state=tk.NORMAL, bg="green")
     red_button.config(state=tk.NORMAL, bg="red")
     blue_button.config(state=tk.NORMAL, bg="blue")
@@ -76,6 +78,7 @@ def disable_buttons():
 
 
 def press_button(value):
+    """Append the button pressed to the player_order list, and check for a loss."""
     player_order.append(value)
     check_loss()
 
@@ -83,6 +86,7 @@ def press_button(value):
 def check_loss():
     """Check for a loss in the game, reset game if so"""
     global player_order
+    global score
 
     for i in range(len(player_order)):
         if player_order[i] != game_order[i]:
@@ -90,12 +94,15 @@ def check_loss():
             disable_buttons()
             reset_game()
 
-    if player_order == game_order:
+    if player_order == game_order and len(game_order) != 0:
         player_order = []
+        score += 1
+        score_label.config(text=f"Score: {score}")
         pick_sequence()
 
 
 def reset_game():
+    """Reset all variables and change the play button to be active."""
     global player_order
     global game_order
 
